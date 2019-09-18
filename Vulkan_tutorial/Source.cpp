@@ -43,6 +43,9 @@ class HelloTriangleApplication {
 	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+	VkPhysicalDeviceFeatures deviceFeatures;
+	VkDevice device;
+	VkQueue graphicsQueue;
 
 	const std::vector<const char*> validationLayers = {
 		"VK_LAYER_KHRONOS_validation"
@@ -173,6 +176,7 @@ private:
 		initInstance();
 		setupDebugMessenger();
 		pickPhysicalDevice();
+		createLogicalDevice();
 	}
 
 	struct QueueFamilyIndices {
@@ -241,6 +245,42 @@ private:
 		}
 	}
 
+	void createLogicalDevice() {
+		QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+		VkDeviceQueueCreateInfo queueCreateInfo = {};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = indices.graphicsFamily;
+		queueCreateInfo.queueCount = 1;
+		float queuePriority = 1.0f;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+
+		VkDeviceCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.pQueueCreateInfos = &queueCreateInfo;
+		createInfo.queueCreateInfoCount = 1;
+		
+		//features
+		vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
+		createInfo.pEnabledFeatures = &deviceFeatures;
+
+		//layers
+		createInfo.enabledExtensionCount = 0;
+		if (enableValidationLayers) {
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+			createInfo.ppEnabledLayerNames = validationLayers.data();
+		}
+		else {
+			createInfo.enabledLayerCount = 0;
+		}
+		// creation
+		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create logical device!");
+		}
+		//graphics queue
+		vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
+	}
+
 	void mainLoop() {
 		while (!glfwWindowShouldClose(window)) {
 			glfwPollEvents();
@@ -248,6 +288,7 @@ private:
 	}
 
 	void cleanup() {
+		vkDestroyDevice(device, nullptr);
 		if (enableValidationLayers) {
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 		}
@@ -260,14 +301,17 @@ private:
 
 int main() {
 	HelloTriangleApplication app;
-
+	int res = EXIT_SUCCESS;
 	try {
 		app.run();
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
-		return EXIT_FAILURE;
+		res =  EXIT_FAILURE;
 	}
 
-	return EXIT_SUCCESS;
+	int i;
+	std::cin >> i;
+
+	return res;
 }
