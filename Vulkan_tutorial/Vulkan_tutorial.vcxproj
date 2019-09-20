@@ -144,8 +144,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\glm.0.9.9.600\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\glm.0.9.9.600\build\native\glm.targets'))" />
     <Error Condition="!Exists('packages\glfw.3.3.0.1\build\native\glfw.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\glfw.3.3.0.1\build\native\glfw.targets'))" />
-	<Exec Command="D:\Distr\VulkanSDK\1.1.121.0\Bin\glslangValidator.exe -V shaders\shader.frag" />
-	<Exec Command="D:\Distr\VulkanSDK\1.1.121.0\Bin\glslangValidator.exe -V shaders\shader.vert" />
+	<!-- <Exec Command="D:\Distr\VulkanSDK\1.1.121.0\Bin\glslangValidator.exe -V shaders\shader.frag" /> -->
+	<!-- <Exec Command="D:\Distr\VulkanSDK\1.1.121.0\Bin\glslangValidator.exe -V shaders\shader.vert" /> -->
 	<Exec Command="D:\Distr\VulkanSDK\1.1.121.0\Bin\glslc.exe shaders\shader.frag -o shaders\frag.spv" />
 	<Exec Command="D:\Distr\VulkanSDK\1.1.121.0\Bin\glslc.exe shaders\shader.vert -o shaders\vert.spv" />
   </Target>
