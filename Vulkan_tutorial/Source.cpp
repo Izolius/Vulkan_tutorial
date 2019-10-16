@@ -44,6 +44,8 @@ namespace std
 	};
 }
 
+class HelloTriangleApplication;
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -105,7 +107,10 @@ struct SwapChainSupportDetails {
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
+void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
 class HelloTriangleApplication {
+public:
 	GLFWwindow* window;
 	const int WIDTH = 800;
 	const int HEIGHT = 600;
@@ -133,6 +138,7 @@ class HelloTriangleApplication {
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
+	bool framebufferResized = false;
 
 	const std::vector<const char*> validationLayers = {
 		"VK_LAYER_KHRONOS_validation"
@@ -160,7 +166,9 @@ private:
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-
+		glfwSetWindowUserPointer(window, this);
+		glfwSetFramebufferSizeCallback(window,
+			framebufferResizeCallback);
 	}
 
 	bool checkValidationLayerSupport() {
@@ -883,7 +891,8 @@ private:
 		uint32_t imageIndex;
 		VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+			framebufferResized = false;
 			recreateSwapChain();
 			return;
 		}
@@ -957,6 +966,12 @@ private:
 		glfwTerminate();
 	}
 };
+
+void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+	auto app =
+		reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+	app->framebufferResized = true;
+}
 
 int main() {
 	HelloTriangleApplication app;
