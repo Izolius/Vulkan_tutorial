@@ -11,6 +11,7 @@
 #include <set>
 #include <cstdint>
 #include <algorithm>
+#include "Vertex.h"
 
 namespace std
 {
@@ -109,6 +110,8 @@ struct SwapChainSupportDetails {
 
 void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
+
+
 class HelloTriangleApplication {
 public:
 	GLFWwindow* window;
@@ -146,6 +149,12 @@ public:
 	const std::vector<const char*> deviceExtensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
+
+	const std::vector<Vertex> vertices = {
+		{ {0.0f, -0.5f},{ 1.0f, 0.0f, 0.0f }},
+		{ {0.5f, 0.5f},{ 0.0f, 1.0f, 0.0f }},
+		{ {-0.5f, 0.5f},{ 0.0f, 0.0f, 1.0f }}
+		};
 
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;
