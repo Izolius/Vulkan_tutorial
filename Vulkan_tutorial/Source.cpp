@@ -835,6 +835,11 @@ private:
 
 		vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
 
+		// перемещаем массив вершин в вершинный буфер
+		void* data;
+		vkMapMemory(device, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+		memcpy(data, vertices.data(), bufferInfo.size);
+		vkUnmapMemory(device, vertexBufferMemory);
 
 	}
 
